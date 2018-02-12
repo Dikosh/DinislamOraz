@@ -1,0 +1,51 @@
+---
+title: "Урок 4"
+author: "Динислам"
+date: '12 февраля 2018 г '
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Урок 4
+
+
+Метри исчисления эффективности модели:
+
+* Accuracy = (TP+TN)/(TP+TN+FP+FN)
+* Precision = TP/(TP+FP)
+* Recall = Sensitivity = TP/(TP+FN) 
+* F-measure = 2*Precision*recall/(precision+recall)
+* ROC curve (Area under the curve)= Precision*Recall
+* Error rate = 1 - Accuracy
+
+
+```{r}
+df <- read.csv("../Desktop/train (1).csv")
+test <- read.csv("../Desktop/test (1).csv")
+subm <- read.csv("../Desktop/gender_submission.csv")
+attach(df)
+colnames(df)
+df <- df[,c(2,3,5,6,7,8,10,11,12)]
+library(rpart)
+library(caret)
+index <- createDataPartition(df$Survived,p=0.8,list=FALSE)
+tr <- df[index,]
+ts <- df[-index,]
+tr$Cabin <- NULL
+dt <- rpart(Survived~.,tr)
+prd <- predict(dt,ts)
+library(ROSE)
+roc.curve(ts$Survived,prd)
+```
+
+# как же все чотко
+
+```{r}
+predict <- predict(dt,test)
+subm$Survived <- round(predict)
+write.csv(subm,"../Desktop/olala.csv",row.names = FALSE)
+```
+
